@@ -166,6 +166,7 @@ public class WorkerExecution {
 
     public void receiveMarginals(final int blockId, final int dimension, final MarginalDistribution marginals, long time) {
         blocks.get(blockId).sumToGlobalMarginals(marginals, dimension);
+        System.out.println("Confirm to the master that marginals of dimension " + dimension + " of block " + blockId + " have been added");
         worker.sendMessageToMaster(new ReceiveMarginalsResponse(executionId, blockId, dimension, time));
     }
 
