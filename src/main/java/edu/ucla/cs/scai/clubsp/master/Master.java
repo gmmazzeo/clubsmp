@@ -101,7 +101,7 @@ public class Master {
     }
 
     //send a message to a registered worker
-    public void sendMessage(String workerId, ClubsPMessage message) {
+    public synchronized void sendMessage(String workerId, ClubsPMessage message) {
         try {
             workerOutputStreams.get(workerId).writeObject(message);
         } catch (Exception e) {

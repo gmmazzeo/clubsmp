@@ -128,7 +128,7 @@ public class Worker {
         }
     }
 
-    public void sendMessageToMaster(ClubsPMessage message) {
+    public synchronized void sendMessageToMaster(ClubsPMessage message) {
         try {
             masterOutputStream.writeObject(message);
         } catch (Exception e) {
@@ -136,7 +136,7 @@ public class Worker {
         }
     }
 
-    public void sendMessageToWorker(String workerId, ClubsPMessage message) {
+    public synchronized void sendMessageToWorker(String workerId, ClubsPMessage message) {
         try {
             workerOutputStreams.get(workerId).writeObject(message);
         } catch (Exception e) {
