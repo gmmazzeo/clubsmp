@@ -55,7 +55,7 @@ public class MarginalComputationExecutionPlan {
         return res;
     }
 
-    public synchronized Boolean decreasePairsLeft(int d) {
+    public Boolean decreasePairsLeft(int d) { //returns true when the communication between all the pairs on one level of the tree is completed
         if (numberOfPairsLeft[d] == 0) {
             //an error occurred
             System.out.println("Unexpected situation at "+getClass().getName()+":decreasePairsLeft");

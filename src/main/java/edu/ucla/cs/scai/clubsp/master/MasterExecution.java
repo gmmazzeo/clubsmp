@@ -187,6 +187,7 @@ public class MasterExecution {
                    marginalsMergingTimeDimension0+=System.currentTimeMillis()-lastSendMarginalsDimension0Time;
                 }
                 String workerId = ex.workerAllocations[dimension].get(0);
+                System.out.println("Ask "+workerId+" to compute best split for block "+blockId+" on dimension "+dimension);
                 master.sendMessage(workerId, new ComputeBestSplitRequest(executionId, blockId, dimension, block.globalN, block.globalLS, block.globalSS));
             } else {
                 new Thread() {
