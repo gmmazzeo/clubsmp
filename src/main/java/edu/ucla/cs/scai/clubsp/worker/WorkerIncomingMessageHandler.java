@@ -29,6 +29,7 @@ import edu.ucla.cs.scai.clubsp.messages.RestrictedCountRequest;
 import edu.ucla.cs.scai.clubsp.messages.SendMarginalsRequest;
 import edu.ucla.cs.scai.clubsp.messages.SplitRequest;
 import java.io.ObjectInputStream;
+import java.util.Date;
 
 /**
  *
@@ -49,7 +50,7 @@ class WorkerIncomingMessageHandler extends Thread {
         try {
             while (true) {
                 ClubsPMessage msg = (ClubsPMessage) in.readObject();
-                System.out.println("Received command " + msg);
+                System.out.println(new Date()+": Received command " + msg);
                 if (msg instanceof LoadDataSetRequest) {
                     LoadDataSetRequest c = (LoadDataSetRequest) msg;
                     worker.initExecution(c.executionId, c.dataSetId, c.workers, c.scaleFactor);

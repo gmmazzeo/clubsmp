@@ -27,6 +27,7 @@ import edu.ucla.cs.scai.clubsp.messages.ReceiveMarginalsResponse;
 import edu.ucla.cs.scai.clubsp.messages.RestrictedCountResponse;
 import edu.ucla.cs.scai.clubsp.messages.SplitResponse;
 import java.io.ObjectInputStream;
+import java.util.Date;
 
 /**
  *
@@ -47,7 +48,7 @@ class MasterIncomingMessageHandler extends Thread {
         try {
             while (true) {
                 ClubsPMessage msg = (ClubsPMessage) in.readObject();
-                System.out.println("Received command " + msg);
+                System.out.println(new Date()+": Received command " + msg);
                 if (msg instanceof ExecutionMessage) {
                     MasterExecution ex = master.masterExecutions.get(((ExecutionMessage) msg).executionId);
                     if (msg instanceof LoadDataSetResponse) {

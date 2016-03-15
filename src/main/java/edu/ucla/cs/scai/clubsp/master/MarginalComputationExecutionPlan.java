@@ -36,8 +36,9 @@ public class MarginalComputationExecutionPlan {
 
     public String[][] initComputation(int d) {
         int n = workerAllocations[d].size();
-        if (n == 1 || numberOfPairsLeft[d] > 0) {
-            return null; //this should never happen
+        if (n == 1 || numberOfPairsLeft[d] > 0) { //this should never happen
+            System.out.println("Unexpected situation at "+getClass().getName()+":initComputation");
+            return null;
         }
         String[][] res = new String[n / 2][2];
         for (int i = 0; i < n - 1; i += 2) {
@@ -52,6 +53,7 @@ public class MarginalComputationExecutionPlan {
     public synchronized Boolean decreasePairsLeft(int d) {
         if (numberOfPairsLeft[d] == 0) {
             //an error occurred
+            System.out.println("Unexpected situation at "+getClass().getName()+":decreasePairsLeft");
             return null;
         }
         numberOfPairsLeft[d]--;
