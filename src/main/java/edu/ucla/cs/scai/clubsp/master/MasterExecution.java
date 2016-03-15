@@ -197,6 +197,7 @@ public class MasterExecution {
                         for (int k = 0; k < plan.length; k++) {
                             String s = plan[k][1];
                             String r = plan[k][0];
+                            System.out.println("Ask "+s+" to send the marginals of dimension "+dimension+" of block "+blockId+" to "+r);
                             master.sendMessage(s, new SendMarginalsRequest(executionId, blockId, dimension, r));
                         }
                     }
