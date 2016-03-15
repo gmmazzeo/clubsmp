@@ -56,4 +56,8 @@ public class ReceiveMarginalsResponse extends ExecutionMessage {
         this.time = time;
     }
 
+    @Override
+    public String toString() {
+        return "ReceiveMarginalsResponse{" + "blockId=" + blockId + ", dimension=" + dimension + '}';
+    }    
 }

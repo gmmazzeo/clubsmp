@@ -79,9 +79,4 @@ public class MarginalComputationExecutionPlan {
         }
         return false;
     }
-
-    public boolean executionPlanCompleted() {
-        return completedDimensions.size() == workerAllocations.length;
-    }
-
 }
