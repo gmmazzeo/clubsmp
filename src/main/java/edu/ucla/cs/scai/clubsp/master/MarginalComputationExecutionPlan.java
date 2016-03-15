@@ -34,7 +34,7 @@ public class MarginalComputationExecutionPlan {
         }
     }
 
-    public String[][] initComputation(int d) {
+    public String[][] initComputation(int d) {        
         int n = workerAllocations[d].size();
         if (n == 1 || numberOfPairsLeft[d] > 0) { //this should never happen
             System.out.println("Unexpected situation at "+getClass().getName()+":initComputation");
@@ -47,6 +47,11 @@ public class MarginalComputationExecutionPlan {
             res[i / 2][1] = workerAllocations[d].get(i + 1);
         }
         numberOfPairsLeft[d] = res.length;
+        System.out.print("MCP for dimension "+d+": ");
+        for (String[] re : res) {
+            System.out.print(" " + re[0] + " <- " + re[1]);
+        }
+        System.out.println();
         return res;
     }
 
@@ -57,7 +62,7 @@ public class MarginalComputationExecutionPlan {
             return null;
         }
         numberOfPairsLeft[d]--;
-        if (numberOfPairsLeft[d] == 0) {
+        if (numberOfPairsLeft[d] == 0) { //the computation of the current level of the tree representing the MCP is complete
             //remove machines with odd index
             ArrayList<String> newMachineAllocation = new ArrayList<>();
             for (int i = 0; i < workerAllocations[d].size(); i++) {
@@ -67,6 +72,7 @@ public class MarginalComputationExecutionPlan {
             }
             workerAllocations[d] = newMachineAllocation;
             if (newMachineAllocation.size() == 1) {
+                System.out.println("MCP completed for dimension "+d);
                 completedDimensions.add(d);
             }
             return true;

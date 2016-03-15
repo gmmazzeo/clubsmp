@@ -176,7 +176,7 @@ public class MasterExecution {
         final MarginalComputationExecutionPlan ex = marginalComputationExecutionPlans.get(blockId);
         final MasterClusterBlock block = blocks.get(blockId);
         boolean allReceived = ex.decreasePairsLeft(dimension);
-        System.out.println("Tranfer time for marginals of block "+blockId+" dimension "+dimension+": "+time);
+        //System.out.println("Tranfer time for marginals of block "+blockId+" dimension "+dimension+": "+time);
         marginalTransferTime[dimension]+=time;
         if (dimension==0) {
             marginalsMergingMsgCountDimension0++;
