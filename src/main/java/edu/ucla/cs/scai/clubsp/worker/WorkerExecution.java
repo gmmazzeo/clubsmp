@@ -176,6 +176,7 @@ public class WorkerExecution {
         block.setGlobalLS(globalLS);
         block.setGlobalSS(globalSS);
         BestSplitResult split = block.computeBestSplit(dimension);
+        System.out.println("Send to the master the best split for block "+blockId+" on dimension "+dimension);
         worker.sendMessageToMaster(new ComputeBestSplitResponse(executionId, blockId, dimension, split));
     }
 
