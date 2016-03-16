@@ -62,16 +62,27 @@ class WorkerIncomingMessageHandler extends Thread {
                     GenerateDataSetRequest c = (GenerateDataSetRequest) msg;
                     worker.doGeneration(c.nOfTuples, c.domainWidth, c.noiseRatio, c.centers, c.radii);
                 } else if (msg instanceof ExecutionMessage) {
-                    WorkerExecution ex = worker.workerExecutions.get(((ExecutionMessage) msg).executionId);
+                    final WorkerExecution ex = worker.workerExecutions.get(((ExecutionMessage) msg).executionId);
                     if (msg instanceof InitRootRequest) {
                         InitRootRequest c = (InitRootRequest) msg;
                         ex.initRoot(c.globalDomain);
                     } else if (msg instanceof SendMarginalsRequest) {
-                        SendMarginalsRequest c = (SendMarginalsRequest) msg;
-                        ex.sendMarginals(c.blockId, c.dimension, c.receiverId);
+                        final SendMarginalsRequest c = (SendMarginalsRequest) msg;
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                ex.sendMarginals(c.blockId, c.dimension, c.receiverId);
+                            }
+                                                    
+                        }.start();
                     } else if (msg instanceof ReceiveMarginalsRequest) {
-                        ReceiveMarginalsRequest c = (ReceiveMarginalsRequest) msg;
-                        ex.receiveMarginals(c.blockId, c.dimension, c.marginals, System.currentTimeMillis() - c.time);
+                        final ReceiveMarginalsRequest c = (ReceiveMarginalsRequest) msg;
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                ex.receiveMarginals(c.blockId, c.dimension, c.marginals, System.currentTimeMillis() - c.time);
+                            }                          
+                        }.start();
                     } else if (msg instanceof ComputeBestSplitRequest) {
                         ComputeBestSplitRequest c = (ComputeBestSplitRequest) msg;
                         ex.computeBestSplit(c.blockId, c.dimension, c.globalN, c.globalLS, c.globalSS);
