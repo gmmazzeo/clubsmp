@@ -65,6 +65,7 @@ public class WorkerExecution {
     Worker worker;
     double scaleFactor;
     private static final double radiusMultiplier = 3;
+    private Object[] marginalLocks;
 
     public WorkerExecution(final Worker worker, final String executionId, final String dataSetId, final double scaleFactor) {
         this.worker = worker;
@@ -72,44 +73,48 @@ public class WorkerExecution {
         this.dataSetId = dataSetId;
         this.scaleFactor = scaleFactor;
         //new Thread() {
-            //@Override
-            //public void run() {
-                try {
-                    BufferedReader in = new BufferedReader(new FileReader(worker.datasetsPath + dataSetId));
-                    dataSet = new ArrayList<>();
-                    String l = in.readLine();
-                    if (l != null && l.trim().length() > 0) {
-                        StringTokenizer st = new StringTokenizer(l, ", \t");
-                        dimensionality = st.countTokens();
-                    } else {
-                        dimensionality = 0;
-                    }
-                    int j = 0;
-                    int[] inf = new int[dimensionality];
-                    int[] sup = new int[dimensionality];
-                    for (int i = 0; i < dimensionality; i++) {
-                        inf[i] = Integer.MAX_VALUE;
-                        sup[i] = Integer.MIN_VALUE;
-                    }
-                    while (l != null && l.trim().length() > 0) {
-                        StringTokenizer st = new StringTokenizer(l, ", \t");
-                        int[] p = new int[dimensionality];
-                        for (int i = 0; i < dimensionality; i++) {
-                            p[i] = (int) (Integer.parseInt(st.nextToken()) / scaleFactor + 0.5);
-                            inf[i] = Math.min(p[i], inf[i]);
-                            sup[i] = Math.max(p[i], sup[i]);
-                        }
-                        dataSet.add(new DataSetPoint(p, j));
-                        l = in.readLine();
-                        j++;
-                    }
-                    dataSetSize = dataSet.size();
-                    localDomain = new Range(inf, sup);
-                    worker.sendMessageToMaster(new LoadDataSetResponse(executionId, localDomain));
-                } catch (IOException | NumberFormatException e) {
-                    e.printStackTrace();
+        //@Override
+        //public void run() {
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(worker.datasetsPath + dataSetId));
+            dataSet = new ArrayList<>();
+            String l = in.readLine();
+            if (l != null && l.trim().length() > 0) {
+                StringTokenizer st = new StringTokenizer(l, ", \t");
+                dimensionality = st.countTokens();
+            } else {
+                dimensionality = 0;
+            }
+            marginalLocks = new Object[dimensionality];
+            for (int i = 0; i < dimensionality; i++) {
+                marginalLocks[i] = new Object();
+            }
+            int j = 0;
+            int[] inf = new int[dimensionality];
+            int[] sup = new int[dimensionality];
+            for (int i = 0; i < dimensionality; i++) {
+                inf[i] = Integer.MAX_VALUE;
+                sup[i] = Integer.MIN_VALUE;
+            }
+            while (l != null && l.trim().length() > 0) {
+                StringTokenizer st = new StringTokenizer(l, ", \t");
+                int[] p = new int[dimensionality];
+                for (int i = 0; i < dimensionality; i++) {
+                    p[i] = (int) (Integer.parseInt(st.nextToken()) / scaleFactor + 0.5);
+                    inf[i] = Math.min(p[i], inf[i]);
+                    sup[i] = Math.max(p[i], sup[i]);
                 }
-            //}
+                dataSet.add(new DataSetPoint(p, j));
+                l = in.readLine();
+                j++;
+            }
+            dataSetSize = dataSet.size();
+            localDomain = new Range(inf, sup);
+            worker.sendMessageToMaster(new LoadDataSetResponse(executionId, localDomain));
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+        //}
         //}.start();
     }
 
@@ -154,16 +159,20 @@ public class WorkerExecution {
 
     }
 
-    public synchronized void sendMarginals(int blockId, int dimension, String receiverId) {
-        MarginalDistribution marginals = blocks.get(blockId).getGlobalMarginals(dimension);
-        worker.sendMessageToWorker(receiverId, new ReceiveMarginalsRequest(executionId, blockId, dimension, marginals, System.currentTimeMillis(), receiverId));
+    public void sendMarginals(int blockId, int dimension, String receiverId) {
+        synchronized (marginalLocks[dimension]) {
+            MarginalDistribution marginals = blocks.get(blockId).getGlobalMarginals(dimension);
+            worker.sendMessageToWorker(receiverId, new ReceiveMarginalsRequest(executionId, blockId, dimension, marginals, System.currentTimeMillis(), receiverId));
+        }
     }
 
-    public synchronized void receiveMarginals(final int blockId, final int dimension, final MarginalDistribution marginals, long time) {
-        System.out.println("Start to sum the marginals of dimension "+dimension+" of block "+blockId+" ");
-        blocks.get(blockId).sumToGlobalMarginals(marginals, dimension);
-        System.out.println("Confirm to the master that marginals of dimension " + dimension + " of block " + blockId + " have been added");
-        worker.sendMessageToMaster(new ReceiveMarginalsResponse(executionId, blockId, dimension, time));
+    public void receiveMarginals(final int blockId, final int dimension, final MarginalDistribution marginals, long time) {
+        synchronized (marginalLocks[dimension]) {
+            System.out.println("Start to sum the marginals of dimension " + dimension + " of block " + blockId + " ");
+            blocks.get(blockId).sumToGlobalMarginals(marginals, dimension);
+            System.out.println("Confirm to the master that marginals of dimension " + dimension + " of block " + blockId + " have been added");
+            worker.sendMessageToMaster(new ReceiveMarginalsResponse(executionId, blockId, dimension, time));
+        }
     }
 
     public synchronized void computeBestSplit(int blockId, int dimension, int globalN, double[] globalLS, double[] globalSS) {
@@ -172,7 +181,7 @@ public class WorkerExecution {
         block.setGlobalLS(globalLS);
         block.setGlobalSS(globalSS);
         BestSplitResult split = block.computeBestSplit(dimension);
-        System.out.println("Send to the master the best split for block "+blockId+" on dimension "+dimension);
+        System.out.println("Send to the master the best split for block " + blockId + " on dimension " + dimension);
         worker.sendMessageToMaster(new ComputeBestSplitResponse(executionId, blockId, dimension, split));
     }
 
