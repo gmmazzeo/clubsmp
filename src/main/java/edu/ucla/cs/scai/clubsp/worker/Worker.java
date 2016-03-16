@@ -28,6 +28,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -69,6 +72,30 @@ public class Worker {
     }
 
     public void start() throws Exception {
+        //start the deadlock detection
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+                long[] threadIds = bean.findDeadlockedThreads(); // Returns null if no threads are deadlocked.
+                if (threadIds != null) {
+                    ThreadInfo[] infos = bean.getThreadInfo(threadIds);
+                    for (ThreadInfo info : infos) {
+                        StackTraceElement[] stack = info.getStackTrace();
+                        System.out.println("Deadlock detected:");
+                        for (StackTraceElement s : stack) {
+                            System.out.println(s);
+                        }
+                    }
+                    System.exit(0);
+                }
+            }
+        }.start();
         try (ServerSocket listener = new ServerSocket(port);) {
             System.out.println("Worker started. Waiting for an id");
             //register with the master
@@ -97,14 +124,14 @@ public class Worker {
                         socketIn.setKeepAlive(true);
                         WorkerConnectionResponse res = (WorkerConnectionResponse) msg;
                         this.id = res.assignedId;
-                        System.out.println("Received id: " + this.id);                        
+                        System.out.println("Received id: " + this.id);
                         new WorkerIncomingMessageHandler(in, this).start();
                         System.out.println("Started listener on socket from master");
                         //don't close anything
                     } else if (msg instanceof WorkerConnectionRequest2) {
                         socketIn.setTcpNoDelay(true);
                         socketIn.setKeepAlive(true);
-                        WorkerConnectionRequest2 res = (WorkerConnectionRequest2) msg;                        
+                        WorkerConnectionRequest2 res = (WorkerConnectionRequest2) msg;
                         new WorkerIncomingMessageHandler(in, this).start();
                         System.out.println("Started listener on socket from worker " + res.id);
                         //don't close anything
@@ -132,24 +159,24 @@ public class Worker {
             masterOutputStream.writeObject(message);
             masterOutputStream.flush();
             masterOutputStream.writeObject(new DummyMessage(message.getId()));
-            masterOutputStream.flush(); 
+            masterOutputStream.flush();
         } catch (Exception e) {
-            System.out.println("Error sending "+message+" to master\n"+e.getMessage());
+            System.out.println("Error sending " + message + " to master\n" + e.getMessage());
             e.printStackTrace();
         }
     }
 
     public synchronized void sendMessageToWorker(String workerId, ClubsPMessage message) {
         try {
-            System.out.println("Sending "+message+" to "+workerId);
-            ObjectOutputStream oos=workerOutputStreams.get(workerId);
+            System.out.println("Sending " + message + " to " + workerId);
+            ObjectOutputStream oos = workerOutputStreams.get(workerId);
             oos.writeObject(message);
             oos.flush();
             oos.writeObject(new DummyMessage(message.getId()));
             oos.flush();
-            System.out.println("Sent "+message+" to "+workerId);
+            System.out.println("Sent " + message + " to " + workerId);
         } catch (Exception e) {
-            System.out.println("Error sending "+message+" to worker "+workerId+"\n"+e.getMessage());
+            System.out.println("Error sending " + message + " to worker " + workerId + "\n" + e.getMessage());
             e.printStackTrace();
         }
     }

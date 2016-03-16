@@ -16,6 +16,9 @@ import edu.ucla.cs.scai.clubsp.messages.WorkerConnectionResponse;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -42,7 +45,31 @@ public class Master {
 
     //start listening on the port specified with the constructor
     public void start() throws Exception {
+        //start the deadlock detection
+        new Thread() {
 
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Master.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+                long[] threadIds = bean.findDeadlockedThreads(); // Returns null if no threads are deadlocked.
+                if (threadIds != null) {
+                    ThreadInfo[] infos = bean.getThreadInfo(threadIds);
+                    for (ThreadInfo info : infos) {
+                        StackTraceElement[] stack = info.getStackTrace();
+                        System.out.println("Deadlock detected:");
+                        for (StackTraceElement s : stack) {
+                            System.out.println(s);
+                        }
+                    }
+                    System.exit(0);
+                }
+            }
+        }.start();
         try (ServerSocket listener = new ServerSocket(port);) {
             System.out.println("Master started at " + listener.getInetAddress().toString() + ":" + listener.getLocalPort());
             while (true) {
