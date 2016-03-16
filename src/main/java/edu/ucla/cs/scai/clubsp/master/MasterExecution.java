@@ -97,22 +97,22 @@ public class MasterExecution {
         this.executionId = dataSetId + "_" + startTime;
         this.workerIds.addAll(master.registeredWorkers.keySet());
         final HashMap<String, RegisteredWorker> currentWorkers = new HashMap<>(master.registeredWorkers);
-        new Thread() {
-            @Override
-            public void run() {
-                LoadDataSetRequest c = new LoadDataSetRequest(dataSetId, executionId, currentWorkers, scaleFactor);
-                for (String workerId : workerIds) {
-                    master.sendMessage(workerId, c);
-                }
-            }
-        }.start();
+        //new Thread() {
+        //@Override
+        //public void run() {
+        LoadDataSetRequest c = new LoadDataSetRequest(dataSetId, executionId, currentWorkers, scaleFactor);
+        for (String workerId : workerIds) {
+            master.sendMessage(workerId, c);
+        }
+        //}
+        //}.start();
     }
 
     public synchronized void increaseReceivedLocalDoamins(Range localDomain) {
         if (receivedLocalDomains == 0) {
             globalDomain = localDomain;
             dimensionality = localDomain.getDimensionality();
-            marginalTransferTime=new long[dimensionality];
+            marginalTransferTime = new long[dimensionality];
         } else {
             for (int i = 0; i < localDomain.inf.length; i++) {
                 globalDomain.inf[i] = Math.min(globalDomain.inf[i], localDomain.inf[i]);
@@ -148,16 +148,16 @@ public class MasterExecution {
         final MasterClusterBlock block = splittingQueue.poll();
         final MarginalComputationExecutionPlan ep = new MarginalComputationExecutionPlan(dimensionality, workerIds);
         marginalComputationExecutionPlans.put(block.id, ep);
-        new Thread() {
-            @Override
-            public void run() {
+        //new Thread() {
+        //    @Override
+        //    public void run() {
                 for (int i = 0; i < dimensionality; i++) {
                     if (workerIds.size() == 1) {
                         String workerId = workerIds.get(0);
                         master.sendMessage(workerId, new ComputeBestSplitRequest(executionId, block.id, i, block.globalN, block.globalLS, block.globalSS));
                     } else {
-                        if (i==0) {
-                            lastSendMarginalsDimension0Time=System.currentTimeMillis();
+                        if (i == 0) {
+                            lastSendMarginalsDimension0Time = System.currentTimeMillis();
                         }
                         String[][] plan = ep.initComputation(i);
                         for (int k = 0; k < plan.length; k++) {
@@ -167,41 +167,40 @@ public class MasterExecution {
                         }
                     }
                 }
-            }
-
-        }.start();
+            //}
+        //}.start();
     }
 
-    public synchronized void increaseReceivedMarginals(final int blockId, final int dimension, long time) {        
+    public synchronized void increaseReceivedMarginals(final int blockId, final int dimension, long time) {
         final MarginalComputationExecutionPlan ex = marginalComputationExecutionPlans.get(blockId);
         final MasterClusterBlock block = blocks.get(blockId);
         boolean allReceived = ex.decreasePairsLeft(dimension);
         //System.out.println("Tranfer time for marginals of block "+blockId+" dimension "+dimension+": "+time);
-        marginalTransferTime[dimension]+=time;
-        if (dimension==0) {
+        marginalTransferTime[dimension] += time;
+        if (dimension == 0) {
             marginalsMergingMsgCountDimension0++;
         }
-        if (allReceived) {            
+        if (allReceived) {
             if (ex.completedDimensions.contains(dimension)) {
-                if (dimension==0) {
-                   marginalsMergingTimeDimension0+=System.currentTimeMillis()-lastSendMarginalsDimension0Time;
+                if (dimension == 0) {
+                    marginalsMergingTimeDimension0 += System.currentTimeMillis() - lastSendMarginalsDimension0Time;
                 }
                 String workerId = ex.workerAllocations[dimension].get(0);
-                System.out.println("Ask "+workerId+" to compute best split for block "+blockId+" on dimension "+dimension);
+                System.out.println("Ask " + workerId + " to compute best split for block " + blockId + " on dimension " + dimension);
                 master.sendMessage(workerId, new ComputeBestSplitRequest(executionId, blockId, dimension, block.globalN, block.globalLS, block.globalSS));
             } else {
-                new Thread() {
-                    @Override
-                    public void run() {
+                //new Thread() {
+                //    @Override
+                //    public void run() {
                         String[][] plan = ex.initComputation(dimension);
                         for (int k = 0; k < plan.length; k++) {
                             String s = plan[k][1];
                             String r = plan[k][0];
-                            System.out.println("Ask "+s+" to send the marginals of dimension "+dimension+" of block "+blockId+" to "+r);
+                            System.out.println("Ask " + s + " to send the marginals of dimension " + dimension + " of block " + blockId + " to " + r);
                             master.sendMessage(s, new SendMarginalsRequest(executionId, blockId, dimension, r));
                         }
-                    }
-                }.start();
+                //    }
+                //}.start();
             }
         }
     }
@@ -561,12 +560,12 @@ public class MasterExecution {
             System.out.println(clustersAfterDivisiveStep + " blocks after divisive step");
             System.out.println(clusters.size() + " clusters found");
             System.out.println("Marginal transfer time");
-            long tot=0;
-            for (int d=0; d<dimensionality; d++) {
-                System.out.println("Dimension "+d+": "+marginalTransferTime[d]);
-                tot+=marginalTransferTime[d];
+            long tot = 0;
+            for (int d = 0; d < dimensionality; d++) {
+                System.out.println("Dimension " + d + ": " + marginalTransferTime[d]);
+                tot += marginalTransferTime[d];
             }
-            System.out.println("Total marginal transfer time: "+tot);
+            System.out.println("Total marginal transfer time: " + tot);
         }
     }
 

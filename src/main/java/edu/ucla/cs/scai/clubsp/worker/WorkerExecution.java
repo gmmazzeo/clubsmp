@@ -71,10 +71,9 @@ public class WorkerExecution {
         this.executionId = executionId;
         this.dataSetId = dataSetId;
         this.scaleFactor = scaleFactor;
-        new Thread() {
-
-            @Override
-            public void run() {
+        //new Thread() {
+            //@Override
+            //public void run() {
                 try {
                     BufferedReader in = new BufferedReader(new FileReader(worker.datasetsPath + dataSetId));
                     dataSet = new ArrayList<>();
@@ -110,8 +109,8 @@ public class WorkerExecution {
                 } catch (IOException | NumberFormatException e) {
                     e.printStackTrace();
                 }
-            }
-        }.start();
+            //}
+        //}.start();
     }
 
     public String getDataSet() {
