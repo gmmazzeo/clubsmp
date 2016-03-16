@@ -109,6 +109,7 @@ public class Worker {
                 Socket socketOut = new Socket(masterIp, masterPort);
                 socketOut.setTcpNoDelay(true);
                 socketOut.setKeepAlive(true);
+                socketOut.setSoTimeout(0);
                 masterOutputStream = new ObjectOutputStream(socketOut.getOutputStream());
                 System.out.println("Saved socket to send messages to master");
                 masterOutputStream.writeObject(new WorkerConnectionRequest(port));
@@ -252,6 +253,7 @@ public class Worker {
                     Socket socketOut = new Socket(worker.ip, worker.port);
                     socketOut.setTcpNoDelay(true);
                     socketOut.setKeepAlive(true);
+                    socketOut.setSoTimeout(0);
                     ObjectOutputStream out = new ObjectOutputStream(socketOut.getOutputStream());
                     workerOutputStreams.put(worker.id, out);
                     System.out.println("Saved socket to send messages to worker " + worker.id);

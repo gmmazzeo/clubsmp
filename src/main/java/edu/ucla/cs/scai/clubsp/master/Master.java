@@ -89,6 +89,7 @@ public class Master {
                         System.out.println("Worker " + id + " registered");
                         socketIn.setTcpNoDelay(true);
                         socketIn.setKeepAlive(true);
+                        socketIn.setSoTimeout(0);
                         new MasterIncomingMessageHandler(in, this).start();
                         System.out.println("Started listener on socket from worker " + id);
                         String[] ip = socketIn.getInetAddress().toString().split("\\/");
@@ -96,6 +97,7 @@ public class Master {
                         Socket socketOut = new Socket(ip[ip.length - 1], c.port);
                         socketOut.setTcpNoDelay(true);
                         socketOut.setKeepAlive(true);
+                        socketOut.setSoTimeout(0);
                         workerOutputStreams.put(id, new ObjectOutputStream(socketOut.getOutputStream()));
                         System.out.println("Saved socket to send messages to worker " + id);
                         sendMessage(id, new WorkerConnectionResponse(id));
