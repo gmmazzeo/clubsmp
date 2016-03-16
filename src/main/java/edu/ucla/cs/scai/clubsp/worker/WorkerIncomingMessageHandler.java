@@ -18,6 +18,7 @@ package edu.ucla.cs.scai.clubsp.worker;
 import edu.ucla.cs.scai.clubsp.messages.ClubsPMessage;
 import edu.ucla.cs.scai.clubsp.messages.ComputeBestSplitRequest;
 import edu.ucla.cs.scai.clubsp.messages.ComputeValleyCriterionRequest;
+import edu.ucla.cs.scai.clubsp.messages.DummyMessage;
 import edu.ucla.cs.scai.clubsp.messages.ExecutionMessage;
 import edu.ucla.cs.scai.clubsp.messages.FinalRefinementRequest;
 import edu.ucla.cs.scai.clubsp.messages.GenerateDataSetRequest;
@@ -89,6 +90,7 @@ class WorkerIncomingMessageHandler extends Thread {
                     } else {
                         System.out.println("Unrecognized message type");
                     }
+                } else if (msg instanceof DummyMessage) {
                 } else {
                     System.out.println("Unrecognized message type");
                 }

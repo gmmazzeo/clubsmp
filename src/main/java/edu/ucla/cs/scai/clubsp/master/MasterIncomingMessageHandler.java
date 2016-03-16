@@ -18,6 +18,7 @@ package edu.ucla.cs.scai.clubsp.master;
 import edu.ucla.cs.scai.clubsp.messages.ClubsPMessage;
 import edu.ucla.cs.scai.clubsp.messages.ComputeBestSplitResponse;
 import edu.ucla.cs.scai.clubsp.messages.ComputeValleyCriterionResponse;
+import edu.ucla.cs.scai.clubsp.messages.DummyMessage;
 import edu.ucla.cs.scai.clubsp.messages.ExecutionMessage;
 import edu.ucla.cs.scai.clubsp.messages.FinalRefinementResponse;
 import edu.ucla.cs.scai.clubsp.messages.InitRootResponse;
@@ -81,6 +82,7 @@ class MasterIncomingMessageHandler extends Thread {
                     } else {
                         System.out.println("Unrecognized message type");
                     }
+                } else if (msg instanceof DummyMessage) {
                 } else {
                     System.out.println("Unrecognized message type");
                 }

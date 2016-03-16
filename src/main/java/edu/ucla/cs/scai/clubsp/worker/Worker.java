@@ -132,7 +132,7 @@ public class Worker {
             masterOutputStream.writeObject(message);
             masterOutputStream.flush();
             masterOutputStream.writeObject(new DummyMessage());
-            masterOutputStream.flush();
+            masterOutputStream.flush(); 
         } catch (Exception e) {
             e.printStackTrace();
         }
