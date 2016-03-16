@@ -175,14 +175,16 @@ public class WorkerExecution {
         }
     }
 
-    public synchronized void computeBestSplit(int blockId, int dimension, int globalN, double[] globalLS, double[] globalSS) {
-        WorkerClusterBlock block = blocks.get(blockId);
-        block.setGlobalN(globalN);
-        block.setGlobalLS(globalLS);
-        block.setGlobalSS(globalSS);
-        BestSplitResult split = block.computeBestSplit(dimension);
-        System.out.println("Send to the master the best split for block " + blockId + " on dimension " + dimension);
-        worker.sendMessageToMaster(new ComputeBestSplitResponse(executionId, blockId, dimension, split));
+    public void computeBestSplit(int blockId, int dimension, int globalN, double[] globalLS, double[] globalSS) {
+        synchronized (marginalLocks[dimension]) {
+            WorkerClusterBlock block = blocks.get(blockId);
+            block.setGlobalN(globalN);
+            block.setGlobalLS(globalLS);
+            block.setGlobalSS(globalSS);
+            BestSplitResult split = block.computeBestSplit(dimension);
+            System.out.println("Send to the master the best split for block " + blockId + " on dimension " + dimension);
+            worker.sendMessageToMaster(new ComputeBestSplitResponse(executionId, blockId, dimension, split));
+        }
     }
 
     public synchronized void doSplit(int blockId, int splitDimension, int splitPosition, int leftId, int rightId, int globalN, double[] globalLS, double globalSS[]) {
@@ -200,10 +202,12 @@ public class WorkerExecution {
                         newBlocks[1].localN, newBlocks[1].localLS, newBlocks[1].localSS)));
     }
 
-    public synchronized void computeValleyCriterion(int blockId, int dimension, double delta) {
-        WorkerClusterBlock block = blocks.get(blockId);
-        boolean satisfied = block.valleyCriterion(dimension, delta);
-        worker.sendMessageToMaster(new ComputeValleyCriterionResponse(executionId, blockId, dimension, satisfied));
+    public void computeValleyCriterion(int blockId, int dimension, double delta) {
+        synchronized (marginalLocks[dimension]) {
+            WorkerClusterBlock block = blocks.get(blockId);
+            boolean satisfied = block.valleyCriterion(dimension, delta);
+            worker.sendMessageToMaster(new ComputeValleyCriterionResponse(executionId, blockId, dimension, satisfied));
+        }
     }
 
     public void computeRestrictedCount(ArrayList<Integer> blockIds, ArrayList<Range> restrictedRanges) {
