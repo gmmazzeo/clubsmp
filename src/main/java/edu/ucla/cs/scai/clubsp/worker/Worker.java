@@ -94,6 +94,8 @@ public class Worker {
                             }
                         }
                         System.exit(0);
+                    } else {
+                        System.out.println("No deadlock detected");
                     }
                 }
             }
