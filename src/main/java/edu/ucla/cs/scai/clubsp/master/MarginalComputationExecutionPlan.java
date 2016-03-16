@@ -34,7 +34,7 @@ public class MarginalComputationExecutionPlan {
         }
     }
 
-    public String[][] initComputation(int d) {        
+    public synchronized String[][] initComputation(int d) {        
         int n = workerAllocations[d].size();
         if (n == 1 || numberOfPairsLeft[d] > 0) { //this should never happen
             System.out.println("Unexpected situation at "+getClass().getName()+":initComputation");
@@ -55,7 +55,7 @@ public class MarginalComputationExecutionPlan {
         return res;
     }
 
-    public Boolean decreasePairsLeft(int d) { //returns true when the communication between all the pairs on one level of the tree is completed
+    public synchronized Boolean decreasePairsLeft(int d) { //returns true when the communication between all the pairs on one level of the tree is completed
         if (numberOfPairsLeft[d] == 0) {
             //an error occurred
             System.out.println("Unexpected situation at "+getClass().getName()+":decreasePairsLeft");
