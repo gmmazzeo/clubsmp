@@ -25,6 +25,7 @@ import edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGe
 import static edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGenerator.createImage;
 import static edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGenerator.shuffleDataset;
 import edu.ucla.cs.scai.clustering.syntheticgenerator.Range;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -91,7 +92,7 @@ public class Worker {
                 Socket socketIn = listener.accept();
                 socketIn.setTcpNoDelay(true);
                 try {
-                    ObjectInputStream in = new ObjectInputStream(socketIn.getInputStream());
+                    ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(socketIn.getInputStream()));
                     ClubsPMessage msg = (ClubsPMessage) in.readObject();
                     //System.out.println("Received message " + msg);
                     if (msg instanceof WorkerConnectionResponse) {

@@ -12,6 +12,7 @@ import edu.ucla.cs.scai.clubsp.messages.StartClusteringRequest;
 import edu.ucla.cs.scai.clubsp.messages.StartGenerationRequest;
 import edu.ucla.cs.scai.clubsp.messages.WorkerConnectionRequest;
 import edu.ucla.cs.scai.clubsp.messages.WorkerConnectionResponse;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -49,7 +50,7 @@ public class Master {
                 Socket socketIn = listener.accept();
                 socketIn.setTcpNoDelay(true);
                 try {
-                    ObjectInputStream in = new ObjectInputStream(socketIn.getInputStream());
+                    ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(socketIn.getInputStream()));
                     ClubsPMessage msg = (ClubsPMessage) in.readObject();
                     System.out.println("Received command " + msg);
                     if (msg instanceof WorkerConnectionRequest) {
