@@ -38,10 +38,12 @@ class MasterIncomingMessageHandler extends Thread {
 
     ObjectInputStream in;
     Master master;
+    String senderName;
 
-    public MasterIncomingMessageHandler(ObjectInputStream in, Master master) {
+    public MasterIncomingMessageHandler(ObjectInputStream in, Master master, String senderName) {
         this.in = in;
         this.master = master;
+        this.senderName = senderName;
     }
 
     @Override
@@ -87,7 +89,7 @@ class MasterIncomingMessageHandler extends Thread {
                     System.out.println("Unrecognized message type");
                 }
             } catch (Exception e) {
-                System.out.println("Error reading messare: " + e.getMessage());
+                System.out.println("Error reading from the InputStream written by " + senderName + ": " + e);
                 e.printStackTrace();
             }
         }

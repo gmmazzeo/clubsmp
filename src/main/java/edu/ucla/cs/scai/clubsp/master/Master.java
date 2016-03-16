@@ -90,7 +90,7 @@ public class Master {
                         socketIn.setTcpNoDelay(true);
                         socketIn.setKeepAlive(true);
                         socketIn.setSoTimeout(0);
-                        new MasterIncomingMessageHandler(in, this).start();
+                        new MasterIncomingMessageHandler(in, this, id).start();
                         System.out.println("Started listener on socket from worker " + id);
                         String[] ip = socketIn.getInetAddress().toString().split("\\/");
                         WorkerConnectionRequest c = (WorkerConnectionRequest) msg;

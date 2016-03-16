@@ -40,10 +40,12 @@ class WorkerIncomingMessageHandler extends Thread {
 
     ObjectInputStream in;
     Worker worker;
+    String senderName;
 
-    public WorkerIncomingMessageHandler(ObjectInputStream in, Worker worker) {
+    public WorkerIncomingMessageHandler(ObjectInputStream in, Worker worker, String senderName) {
         this.in = in;
         this.worker = worker;
+        this.senderName = senderName;
     }
 
     @Override
@@ -95,7 +97,7 @@ class WorkerIncomingMessageHandler extends Thread {
                     System.out.println("Unrecognized message type");
                 }
             } catch (Exception e) {
-                System.out.println("Error reading message: " + e.getMessage());
+                System.out.println("Error reading from the InputStream written by "+senderName+": " + e);
                 e.printStackTrace();
             }
         }

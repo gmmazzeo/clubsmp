@@ -132,14 +132,14 @@ public class Worker {
                         WorkerConnectionResponse res = (WorkerConnectionResponse) msg;
                         this.id = res.assignedId;
                         System.out.println("Received id: " + this.id);
-                        new WorkerIncomingMessageHandler(in, this).start();
+                        new WorkerIncomingMessageHandler(in, this, "master").start();
                         System.out.println("Started listener on socket from master");
                         //don't close anything
                     } else if (msg instanceof WorkerConnectionRequest2) {
                         socketIn.setTcpNoDelay(true);
                         socketIn.setKeepAlive(true);
                         WorkerConnectionRequest2 res = (WorkerConnectionRequest2) msg;
-                        new WorkerIncomingMessageHandler(in, this).start();
+                        new WorkerIncomingMessageHandler(in, this, res.id).start();
                         System.out.println("Started listener on socket from worker " + res.id);
                         //don't close anything
                     } else {
