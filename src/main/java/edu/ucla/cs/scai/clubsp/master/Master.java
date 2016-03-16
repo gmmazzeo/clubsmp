@@ -109,6 +109,7 @@ public class Master {
             oos.writeObject(new DummyMessage(message.getId()));
             oos.flush();
         } catch (Exception e) {
+            System.out.println("Error sending "+message+" to worker "+workerId+"\n"+e.getMessage());
             e.printStackTrace();
         }
     }

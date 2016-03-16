@@ -134,6 +134,7 @@ public class Worker {
             masterOutputStream.writeObject(new DummyMessage(message.getId()));
             masterOutputStream.flush(); 
         } catch (Exception e) {
+            System.out.println("Error sending "+message+" to master\n"+e.getMessage());
             e.printStackTrace();
         }
     }
@@ -148,6 +149,7 @@ public class Worker {
             oos.flush();
             System.out.println("Sent "+message+" to "+workerId);
         } catch (Exception e) {
+            System.out.println("Error sending "+message+" to worker "+workerId+"\n"+e.getMessage());
             e.printStackTrace();
         }
     }
