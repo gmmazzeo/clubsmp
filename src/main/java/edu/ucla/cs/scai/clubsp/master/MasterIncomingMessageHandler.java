@@ -51,10 +51,6 @@ class MasterIncomingMessageHandler extends Thread {
         boolean canrun = true;
         while (canrun) {
             try {
-                while (in.available() == 0) {
-                    System.out.println("Nothing available to read");
-                    Thread.sleep(100);
-                }
                 ClubsPMessage msg = (ClubsPMessage) in.readObject();
                 System.out.println(System.currentTimeMillis() + ": Received command " + msg + " " + msg.getId());
                 if (msg instanceof ExecutionMessage) {
