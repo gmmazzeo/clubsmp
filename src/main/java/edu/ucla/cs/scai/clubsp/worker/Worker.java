@@ -165,6 +165,7 @@ public class Worker {
         try {
             System.out.println("Sending " + message + " to master");
             masterOutputStream.writeObject(message);
+            System.out.println("Flushing");
             masterOutputStream.flush();
             //masterOutputStream.writeObject(new DummyMessage(message.getId()));
             //masterOutputStream.flush();
@@ -180,6 +181,7 @@ public class Worker {
             System.out.println("Sending " + message + " to " + workerId);
             ObjectOutputStream oos = workerOutputStreams.get(workerId);
             oos.writeObject(message);
+            System.out.println("Flushing");
             oos.flush();
             //oos.writeObject(new DummyMessage(message.getId()));
             //oos.flush();

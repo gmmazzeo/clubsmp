@@ -243,7 +243,7 @@ public class MasterExecution {
                 }
             }            
         } else {
-            System.out.println("Waiting for the bset split of other "+(dimensionality-bestSplits.size())+" dimensions");
+            System.out.println("Waiting for the best split of other "+(dimensionality-bestSplits.size())+" dimensions");
         }
     }
 
