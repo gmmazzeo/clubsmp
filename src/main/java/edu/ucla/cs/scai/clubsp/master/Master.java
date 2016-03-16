@@ -103,6 +103,7 @@ public class Master {
     public synchronized void sendMessage(String workerId, ClubsPMessage message) {
         try {
             workerOutputStreams.get(workerId).writeObject(message);
+            workerOutputStreams.get(workerId).flush();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -131,6 +131,7 @@ public class Worker {
     public synchronized void sendMessageToMaster(ClubsPMessage message) {
         try {
             masterOutputStream.writeObject(message);
+            masterOutputStream.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -140,6 +141,7 @@ public class Worker {
         try {
             System.out.println("Sending "+message+" to "+workerId);
             workerOutputStreams.get(workerId).writeObject(message);
+            workerOutputStreams.get(workerId).flush();
             System.out.println("Sent "+message+" to "+workerId);
         } catch (Exception e) {
             e.printStackTrace();
