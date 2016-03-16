@@ -232,7 +232,7 @@ public class Worker {
         workerExecutions.put(executionId, newExec);
     }
 
-    public void doGeneration(int nOfTuples, int domainWidth, double noiseRatio, int[][] centers, int[][] radii) {
+    public synchronized void doGeneration(int nOfTuples, int domainWidth, double noiseRatio, int[][] centers, int[][] radii) {
         int nOfClusters = centers.length;
         int dimensionality = centers[0].length;
         String fileName = datasetsPath + nOfTuples + "p_" + dimensionality + "d_" + nOfClusters + "c_" + noiseRatio + "n.data";

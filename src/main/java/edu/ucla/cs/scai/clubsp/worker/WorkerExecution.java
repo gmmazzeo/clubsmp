@@ -118,10 +118,6 @@ public class WorkerExecution {
         return dataSetId;
     }
 
-    public HashMap<Integer, WorkerClusterBlock> getBlockMap() {
-        return blocks;
-    }
-
     @Override
     public int hashCode() {
         int hash = 7;
@@ -159,18 +155,18 @@ public class WorkerExecution {
 
     }
 
-    public void sendMarginals(int blockId, int dimension, String receiverId) {
+    public synchronized void sendMarginals(int blockId, int dimension, String receiverId) {
         MarginalDistribution marginals = blocks.get(blockId).getGlobalMarginals(dimension);
         worker.sendMessageToWorker(receiverId, new ReceiveMarginalsRequest(executionId, blockId, dimension, marginals, System.currentTimeMillis(), receiverId));
     }
 
-    public void receiveMarginals(final int blockId, final int dimension, final MarginalDistribution marginals, long time) {
+    public synchronized void receiveMarginals(final int blockId, final int dimension, final MarginalDistribution marginals, long time) {
         blocks.get(blockId).sumToGlobalMarginals(marginals, dimension);
         System.out.println("Confirm to the master that marginals of dimension " + dimension + " of block " + blockId + " have been added");
         worker.sendMessageToMaster(new ReceiveMarginalsResponse(executionId, blockId, dimension, time));
     }
 
-    public void computeBestSplit(int blockId, int dimension, int globalN, double[] globalLS, double[] globalSS) {
+    public synchronized void computeBestSplit(int blockId, int dimension, int globalN, double[] globalLS, double[] globalSS) {
         WorkerClusterBlock block = blocks.get(blockId);
         block.setGlobalN(globalN);
         block.setGlobalLS(globalLS);
@@ -180,7 +176,7 @@ public class WorkerExecution {
         worker.sendMessageToMaster(new ComputeBestSplitResponse(executionId, blockId, dimension, split));
     }
 
-    public void doSplit(int blockId, int splitDimension, int splitPosition, int leftId, int rightId, int globalN, double[] globalLS, double globalSS[]) {
+    public synchronized void doSplit(int blockId, int splitDimension, int splitPosition, int leftId, int rightId, int globalN, double[] globalLS, double globalSS[]) {
         WorkerClusterBlock block = blocks.get(blockId);
         //the following three values could be already assigned at this point, because the computeBestSplit was previously called on this worker
         //however, it is possibile the for some workers the values were not assigned yet
@@ -195,13 +191,13 @@ public class WorkerExecution {
                         newBlocks[1].localN, newBlocks[1].localLS, newBlocks[1].localSS)));
     }
 
-    public void computeValleyCriterion(int blockId, int dimension, double delta) {
+    public synchronized void computeValleyCriterion(int blockId, int dimension, double delta) {
         WorkerClusterBlock block = blocks.get(blockId);
         boolean satisfied = block.valleyCriterion(dimension, delta);
         worker.sendMessageToMaster(new ComputeValleyCriterionResponse(executionId, blockId, dimension, satisfied));
     }
 
-    public void computeRestrictedCount(ArrayList<Integer> blockIds, ArrayList<Range> restrictedRanges) {
+    public synchronized void computeRestrictedCount(ArrayList<Integer> blockIds, ArrayList<Range> restrictedRanges) {
         ArrayList<Integer> count = new ArrayList<>();
         for (int i = 0; i < blockIds.size(); i++) {
             int c = blocks.get(blockIds.get(i)).rangeCount(restrictedRanges.get(i));
