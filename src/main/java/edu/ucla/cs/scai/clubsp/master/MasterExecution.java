@@ -214,6 +214,7 @@ public class MasterExecution {
         }
         bestSplits.put(dimension, split);
         if (bestSplits.size() == dimensionality) {
+            System.out.println("Best splits computed along all the dimensions");
             double maxSSQ = 0;
             for (Map.Entry<Integer, BestSplitResult> e : bestSplits.entrySet()) {
                 if (e.getValue().getDeltaSSQ() > maxSSQ) {
@@ -240,7 +241,9 @@ public class MasterExecution {
                 } else { //extract next block from queue and start computing its best split
                     startSplitNextEnqueuedBlock();
                 }
-            }
+            }            
+        } else {
+            System.out.println("Waiting for the bset split of other "+(dimensionality-bestSplits.size())+" dimensions");
         }
     }
 
