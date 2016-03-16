@@ -51,7 +51,7 @@ class WorkerIncomingMessageHandler extends Thread {
         try {
             while (true) {
                 ClubsPMessage msg = (ClubsPMessage) in.readObject();
-                System.out.println(System.currentTimeMillis()+": Received command " + msg);
+                System.out.println(System.currentTimeMillis()+": Received command " + msg+" "+msg.getId());
                 if (msg instanceof LoadDataSetRequest) {
                     LoadDataSetRequest c = (LoadDataSetRequest) msg;
                     worker.initExecution(c.executionId, c.dataSetId, c.workers, c.scaleFactor);

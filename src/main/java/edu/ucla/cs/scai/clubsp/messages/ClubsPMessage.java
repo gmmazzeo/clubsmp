@@ -23,13 +23,26 @@ import java.io.Serializable;
  */
 public class ClubsPMessage implements Serializable {
 
+    private static long lastId=0;
+    private static final Object lock = new Object();
+
+    
     public Exception e;
+    long id;
 
     public ClubsPMessage() {
+        synchronized (lock) {
+            lastId++;
+            id=lastId;
+        }
     }
-
+    
     public ClubsPMessage(Exception e) {
         this.e = e;
+    }
+    
+    public long getId() {
+        return id;
     }
 
 }

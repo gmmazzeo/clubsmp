@@ -131,7 +131,7 @@ public class Worker {
         try {
             masterOutputStream.writeObject(message);
             masterOutputStream.flush();
-            masterOutputStream.writeObject(new DummyMessage());
+            masterOutputStream.writeObject(new DummyMessage(message.getId()));
             masterOutputStream.flush(); 
         } catch (Exception e) {
             e.printStackTrace();
@@ -144,7 +144,7 @@ public class Worker {
             ObjectOutputStream oos=workerOutputStreams.get(workerId);
             oos.writeObject(message);
             oos.flush();
-            oos.writeObject(new DummyMessage());
+            oos.writeObject(new DummyMessage(message.getId()));
             oos.flush();
             System.out.println("Sent "+message+" to "+workerId);
         } catch (Exception e) {

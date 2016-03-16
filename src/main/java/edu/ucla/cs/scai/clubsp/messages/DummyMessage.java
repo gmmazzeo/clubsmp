@@ -22,20 +22,23 @@ package edu.ucla.cs.scai.clubsp.messages;
 public class DummyMessage extends ClubsPMessage {
 
     String message;
+    long idMain;
 
-    public DummyMessage(String message) {
+    public DummyMessage(String message, long idMain) {
         super();
         this.message = message;
+        this.idMain = idMain;
     }
 
-    public DummyMessage() {
+    public DummyMessage(long idMain) {
         super();
         this.message = "This is a default message. Enjoy!";
+        this.idMain = idMain;
     }
 
     @Override
     public String toString() {
-        return "DummyMessage{" + "message=" + message + '}';
+        return "DummyMessage{" + "message=" + message + ", idMain=" + idMain + '}';
     }
 
 }

@@ -106,7 +106,7 @@ public class Master {
             ObjectOutputStream oos=workerOutputStreams.get(workerId);
             oos.writeObject(message);
             oos.flush();
-            oos.writeObject(new DummyMessage());
+            oos.writeObject(new DummyMessage(message.getId()));
             oos.flush();
         } catch (Exception e) {
             e.printStackTrace();
