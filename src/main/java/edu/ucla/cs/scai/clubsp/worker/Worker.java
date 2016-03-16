@@ -76,23 +76,25 @@ public class Worker {
         new Thread() {
             @Override
             public void run() {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-                long[] threadIds = bean.findDeadlockedThreads(); // Returns null if no threads are deadlocked.
-                if (threadIds != null) {
-                    ThreadInfo[] infos = bean.getThreadInfo(threadIds);
-                    for (ThreadInfo info : infos) {
-                        StackTraceElement[] stack = info.getStackTrace();
-                        System.out.println("Deadlock detected:");
-                        for (StackTraceElement s : stack) {
-                            System.out.println(s);
-                        }
+                while (true) {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    System.exit(0);
+                    ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+                    long[] threadIds = bean.findDeadlockedThreads(); // Returns null if no threads are deadlocked.
+                    if (threadIds != null) {
+                        ThreadInfo[] infos = bean.getThreadInfo(threadIds);
+                        for (ThreadInfo info : infos) {
+                            StackTraceElement[] stack = info.getStackTrace();
+                            System.out.println("Deadlock detected:");
+                            for (StackTraceElement s : stack) {
+                                System.out.println(s);
+                            }
+                        }
+                        System.exit(0);
+                    }
                 }
             }
         }.start();

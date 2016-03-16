@@ -50,23 +50,25 @@ public class Master {
 
             @Override
             public void run() {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Master.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-                long[] threadIds = bean.findDeadlockedThreads(); // Returns null if no threads are deadlocked.
-                if (threadIds != null) {
-                    ThreadInfo[] infos = bean.getThreadInfo(threadIds);
-                    for (ThreadInfo info : infos) {
-                        StackTraceElement[] stack = info.getStackTrace();
-                        System.out.println("Deadlock detected:");
-                        for (StackTraceElement s : stack) {
-                            System.out.println(s);
-                        }
+                while (true) {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Master.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    System.exit(0);
+                    ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+                    long[] threadIds = bean.findDeadlockedThreads(); // Returns null if no threads are deadlocked.
+                    if (threadIds != null) {
+                        ThreadInfo[] infos = bean.getThreadInfo(threadIds);
+                        for (ThreadInfo info : infos) {
+                            StackTraceElement[] stack = info.getStackTrace();
+                            System.out.println("Deadlock detected:");
+                            for (StackTraceElement s : stack) {
+                                System.out.println(s);
+                            }
+                        }
+                        System.exit(0);
+                    }
                 }
             }
         }.start();
@@ -130,13 +132,13 @@ public class Master {
     //send a message to a registered worker
     public synchronized void sendMessage(String workerId, ClubsPMessage message) {
         try {
-            ObjectOutputStream oos=workerOutputStreams.get(workerId);
+            ObjectOutputStream oos = workerOutputStreams.get(workerId);
             oos.writeObject(message);
             oos.flush();
             oos.writeObject(new DummyMessage(message.getId()));
             oos.flush();
         } catch (Exception e) {
-            System.out.println("Error sending "+message+" to worker "+workerId+"\n"+e.getMessage());
+            System.out.println("Error sending " + message + " to worker " + workerId + "\n" + e.getMessage());
             e.printStackTrace();
         }
     }
