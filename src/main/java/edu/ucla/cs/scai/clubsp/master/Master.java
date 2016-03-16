@@ -137,11 +137,13 @@ public class Master {
     //send a message to a registered worker
     public synchronized void sendMessage(String workerId, ClubsPMessage message) {
         try {
+            System.out.println("Sending " + message + " to " + workerId);
             ObjectOutputStream oos = workerOutputStreams.get(workerId);
             oos.writeObject(message);
             oos.flush();
-            oos.writeObject(new DummyMessage(message.getId()));
-            oos.flush();
+            //oos.writeObject(new DummyMessage(message.getId()));
+            //oos.flush();
+            System.out.println("Sent " + message + " to " + workerId);
         } catch (Exception e) {
             System.out.println("Error sending " + message + " to worker " + workerId + "\n" + e.getMessage());
             e.printStackTrace();

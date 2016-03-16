@@ -163,10 +163,12 @@ public class Worker {
 
     public synchronized void sendMessageToMaster(ClubsPMessage message) {
         try {
+            System.out.println("Sending " + message + " to master");
             masterOutputStream.writeObject(message);
             masterOutputStream.flush();
-            masterOutputStream.writeObject(new DummyMessage(message.getId()));
-            masterOutputStream.flush();
+            //masterOutputStream.writeObject(new DummyMessage(message.getId()));
+            //masterOutputStream.flush();
+            System.out.println("Sent " + message + " to master");
         } catch (Exception e) {
             System.out.println("Error sending " + message + " to master\n" + e.getMessage());
             e.printStackTrace();
@@ -179,8 +181,8 @@ public class Worker {
             ObjectOutputStream oos = workerOutputStreams.get(workerId);
             oos.writeObject(message);
             oos.flush();
-            oos.writeObject(new DummyMessage(message.getId()));
-            oos.flush();
+            //oos.writeObject(new DummyMessage(message.getId()));
+            //oos.flush();
             System.out.println("Sent " + message + " to " + workerId);
         } catch (Exception e) {
             System.out.println("Error sending " + message + " to worker " + workerId + "\n" + e.getMessage());

@@ -160,6 +160,7 @@ public class WorkerExecution {
     }
 
     public synchronized void receiveMarginals(final int blockId, final int dimension, final MarginalDistribution marginals, long time) {
+        System.out.println("Start to sum the marginals of dimension "+dimension+" of block "+blockId+" ");
         blocks.get(blockId).sumToGlobalMarginals(marginals, dimension);
         System.out.println("Confirm to the master that marginals of dimension " + dimension + " of block " + blockId + " have been added");
         worker.sendMessageToMaster(new ReceiveMarginalsResponse(executionId, blockId, dimension, time));
