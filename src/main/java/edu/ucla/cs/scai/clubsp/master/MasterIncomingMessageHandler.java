@@ -53,7 +53,7 @@ class MasterIncomingMessageHandler extends Thread {
             try {
                 while (in.available() == 0) {
                     System.out.println("Nothing available to read");
-                    wait(100);
+                    Thread.sleep(100);
                 }
                 ClubsPMessage msg = (ClubsPMessage) in.readObject();
                 System.out.println(System.currentTimeMillis() + ": Received command " + msg + " " + msg.getId());
