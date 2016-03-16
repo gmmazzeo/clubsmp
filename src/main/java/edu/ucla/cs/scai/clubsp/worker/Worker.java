@@ -25,6 +25,7 @@ import edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGe
 import static edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGenerator.createImage;
 import static edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGenerator.shuffleDataset;
 import edu.ucla.cs.scai.clustering.syntheticgenerator.Range;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -77,7 +78,7 @@ public class Worker {
                 Socket socketOut = new Socket(masterIp, masterPort);
                 socketOut.setTcpNoDelay(true);
                 socketOut.setKeepAlive(true);
-                masterOutputStream = new ObjectOutputStream(socketOut.getOutputStream());
+                masterOutputStream = new ObjectOutputStream(new BufferedOutputStream(socketOut.getOutputStream()));
                 System.out.println("Saved socket to send messages to master");
                 masterOutputStream.writeObject(new WorkerConnectionRequest(port));
             } catch (Exception e) {
@@ -213,7 +214,7 @@ public class Worker {
                     Socket socketOut = new Socket(worker.ip, worker.port);
                     socketOut.setTcpNoDelay(true);
                     socketOut.setKeepAlive(true);
-                    ObjectOutputStream out = new ObjectOutputStream(socketOut.getOutputStream());
+                    ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(socketOut.getOutputStream()));
                     workerOutputStreams.put(worker.id, out);
                     System.out.println("Saved socket to send messages to worker " + worker.id);
                     out.writeObject(new WorkerConnectionRequest2(id));

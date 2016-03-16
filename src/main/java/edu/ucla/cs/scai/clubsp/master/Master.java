@@ -12,6 +12,7 @@ import edu.ucla.cs.scai.clubsp.messages.StartClusteringRequest;
 import edu.ucla.cs.scai.clubsp.messages.StartGenerationRequest;
 import edu.ucla.cs.scai.clubsp.messages.WorkerConnectionRequest;
 import edu.ucla.cs.scai.clubsp.messages.WorkerConnectionResponse;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -63,7 +64,7 @@ public class Master {
                         Socket socketOut = new Socket(ip[ip.length - 1], c.port);
                         socketOut.setTcpNoDelay(true);
                         socketOut.setKeepAlive(true);
-                        workerOutputStreams.put(id, new ObjectOutputStream(socketOut.getOutputStream()));
+                        workerOutputStreams.put(id, new ObjectOutputStream(new BufferedOutputStream(socketOut.getOutputStream())));
                         System.out.println("Saved socket to send messages to worker " + id);
                         sendMessage(id, new WorkerConnectionResponse(id));
                         registeredWorkers.put(id, new RegisteredWorker(id, ip[ip.length - 1], c.port));
