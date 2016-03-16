@@ -106,6 +106,7 @@ public class Worker {
             System.out.println("Worker started. Waiting for an id");
             //register with the master
             try {
+                //only this socket will be used by the worker to send messages to the master
                 Socket socketOut = new Socket(masterIp, masterPort);
                 socketOut.setTcpNoDelay(true);
                 socketOut.setKeepAlive(true);
@@ -127,6 +128,9 @@ public class Worker {
                     ClubsPMessage msg = (ClubsPMessage) in.readObject();
                     //System.out.println("Received message " + msg);
                     if (msg instanceof WorkerConnectionResponse) {
+                        //the master accepted the connection
+                        //the socket is associated with an handler
+                        //the master will use only this socket to send messages to this worker
                         socketIn.setTcpNoDelay(true);
                         socketIn.setKeepAlive(true);
                         WorkerConnectionResponse res = (WorkerConnectionResponse) msg;
@@ -136,8 +140,11 @@ public class Worker {
                         System.out.println("Started listener on socket from master");
                         //don't close anything
                     } else if (msg instanceof WorkerConnectionRequest2) {
+                        //this socket is associate with an handler
+                        //only this socket will be used by the worker res.id to send messages to this worker
                         socketIn.setTcpNoDelay(true);
                         socketIn.setKeepAlive(true);
+                        socketIn.setSoTimeout(0);
                         WorkerConnectionRequest2 res = (WorkerConnectionRequest2) msg;
                         new WorkerIncomingMessageHandler(in, this, res.id).start();
                         System.out.println("Started listener on socket from worker " + res.id);
@@ -254,6 +261,7 @@ public class Worker {
         for (RegisteredWorker worker : workers.values()) {
             if (!workerOutputStreams.containsKey(worker.id) && !worker.id.equals(id)) {
                 try {
+                    //only this socket will be used by this worker to send messages to worker worker.id
                     Socket socketOut = new Socket(worker.ip, worker.port);
                     socketOut.setTcpNoDelay(true);
                     socketOut.setKeepAlive(true);

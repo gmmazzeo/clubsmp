@@ -48,7 +48,8 @@ class MasterIncomingMessageHandler extends Thread {
 
     @Override
     public void run() {
-        while (true) {
+        boolean canrun=true;
+        while (canrun) {
             try {
                 ClubsPMessage msg = (ClubsPMessage) in.readObject();
                 System.out.println(System.currentTimeMillis() + ": Received command " + msg + " " + msg.getId());
@@ -93,5 +94,6 @@ class MasterIncomingMessageHandler extends Thread {
                 e.printStackTrace();
             }
         }
+        System.out.println("Error: a MasterMessageHandler stopped working!!!");
     }
 }

@@ -50,7 +50,8 @@ class WorkerIncomingMessageHandler extends Thread {
 
     @Override
     public void run() {
-        while (true) {
+        boolean canrun=true;
+        while (canrun) {
             try {
                 ClubsPMessage msg = (ClubsPMessage) in.readObject();
                 System.out.println(System.currentTimeMillis() + ": Received command " + msg + " " + msg.getId());
@@ -99,7 +100,8 @@ class WorkerIncomingMessageHandler extends Thread {
             } catch (Exception e) {
                 System.out.println("Error reading from the InputStream written by "+senderName+": " + e);
                 e.printStackTrace();
-            }
-        }
+            }            
+        }    
+        System.out.println("Error: a WorkerMessageHandler stopped working!!!");
     }
 }

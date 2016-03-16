@@ -85,15 +85,19 @@ public class Master {
                     ClubsPMessage msg = (ClubsPMessage) in.readObject();
                     System.out.println("Received command " + msg);
                     if (msg instanceof WorkerConnectionRequest) {
+                        //when a worker connects to the master, it is associated with an id
                         String id = "w" + (workerOutputStreams.size() + 1);
                         System.out.println("Worker " + id + " registered");
                         socketIn.setTcpNoDelay(true);
                         socketIn.setKeepAlive(true);
                         socketIn.setSoTimeout(0);
+                        //the socket the worker used to connect is associated with an handler
+                        //only this socket will be used by the worker in order to send messages to the master
                         new MasterIncomingMessageHandler(in, this, id).start();
                         System.out.println("Started listener on socket from worker " + id);
                         String[] ip = socketIn.getInetAddress().toString().split("\\/");
                         WorkerConnectionRequest c = (WorkerConnectionRequest) msg;
+                        //only this socket will be used by the master to send messages to the worker
                         Socket socketOut = new Socket(ip[ip.length - 1], c.port);
                         socketOut.setTcpNoDelay(true);
                         socketOut.setKeepAlive(true);
