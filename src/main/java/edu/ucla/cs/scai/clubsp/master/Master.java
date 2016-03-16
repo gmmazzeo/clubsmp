@@ -74,7 +74,7 @@ public class Master {
                 }
             }
         }.start();
-        try (ServerSocket listener = new ServerSocket(port);) {
+        try (ServerSocket listener = new ServerSocket(port, 1000);) {
             System.out.println("Master started at " + listener.getInetAddress().toString() + ":" + listener.getLocalPort());
             while (true) {
                 Socket socketIn = listener.accept();

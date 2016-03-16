@@ -100,7 +100,7 @@ public class Worker {
                 }
             }
         }.start();
-        try (ServerSocket listener = new ServerSocket(port);) {
+        try (ServerSocket listener = new ServerSocket(port, 1000);) {
             System.out.println("Worker started. Waiting for an id");
             //register with the master
             try {
