@@ -17,13 +17,12 @@ package edu.ucla.cs.scai.clubsp.worker;
 
 import edu.ucla.cs.scai.clubsp.commons.RegisteredWorker;
 import edu.ucla.cs.scai.clubsp.messages.ClubsPMessage;
+import edu.ucla.cs.scai.clubsp.messages.DummyMessage;
 import edu.ucla.cs.scai.clubsp.messages.GenerateDataSetRequest;
 import edu.ucla.cs.scai.clubsp.messages.WorkerConnectionRequest;
 import edu.ucla.cs.scai.clubsp.messages.WorkerConnectionRequest2;
 import edu.ucla.cs.scai.clubsp.messages.WorkerConnectionResponse;
 import edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGenerator;
-import static edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGenerator.createImage;
-import static edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGenerator.shuffleDataset;
 import edu.ucla.cs.scai.clustering.syntheticgenerator.Range;
 import java.io.File;
 import java.io.IOException;
@@ -132,6 +131,8 @@ public class Worker {
         try {
             masterOutputStream.writeObject(message);
             masterOutputStream.flush();
+            masterOutputStream.writeObject(new DummyMessage());
+            masterOutputStream.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -140,8 +141,11 @@ public class Worker {
     public synchronized void sendMessageToWorker(String workerId, ClubsPMessage message) {
         try {
             System.out.println("Sending "+message+" to "+workerId);
-            workerOutputStreams.get(workerId).writeObject(message);
-            workerOutputStreams.get(workerId).flush();
+            ObjectOutputStream oos=workerOutputStreams.get(workerId);
+            oos.writeObject(message);
+            oos.flush();
+            oos.writeObject(new DummyMessage());
+            oos.flush();
             System.out.println("Sent "+message+" to "+workerId);
         } catch (Exception e) {
             e.printStackTrace();
@@ -241,9 +245,9 @@ public class Worker {
         Range r = new Range(inf, sup);
         try {
             MultidimensionalGaussianGenerator.generate(fileName, r, nOfTuples, centers, radii, noiseRatio, 100);
-            createImage(fileName, fileName + "_labels", r, true);
+            MultidimensionalGaussianGenerator.createImage(fileName, fileName + "_labels", r, true);
             String fileNameOut = datasetsPath + nOfTuples + "p_" + dimensionality + "d_" + nOfClusters + "c_" + noiseRatio + "n.data";
-            shuffleDataset(fileName, fileName + "_labels", fileNameOut, fileNameOut + "_labels", new Random());
+            MultidimensionalGaussianGenerator.shuffleDataset(fileName, fileName + "_labels", fileNameOut, fileNameOut + "_labels", new Random());
         } catch (Exception e) {
             e.printStackTrace();;
         }

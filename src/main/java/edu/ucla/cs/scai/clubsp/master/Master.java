@@ -7,6 +7,7 @@ package edu.ucla.cs.scai.clubsp.master;
 
 import edu.ucla.cs.scai.clubsp.commons.RegisteredWorker;
 import edu.ucla.cs.scai.clubsp.messages.ClubsPMessage;
+import edu.ucla.cs.scai.clubsp.messages.DummyMessage;
 import edu.ucla.cs.scai.clubsp.messages.GenerateDataSetRequest;
 import edu.ucla.cs.scai.clubsp.messages.StartClusteringRequest;
 import edu.ucla.cs.scai.clubsp.messages.StartGenerationRequest;
@@ -102,8 +103,11 @@ public class Master {
     //send a message to a registered worker
     public synchronized void sendMessage(String workerId, ClubsPMessage message) {
         try {
-            workerOutputStreams.get(workerId).writeObject(message);
-            workerOutputStreams.get(workerId).flush();
+            ObjectOutputStream oos=workerOutputStreams.get(workerId);
+            oos.writeObject(message);
+            oos.flush();
+            oos.writeObject(new DummyMessage());
+            oos.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
