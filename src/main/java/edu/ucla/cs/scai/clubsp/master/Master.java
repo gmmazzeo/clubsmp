@@ -46,8 +46,8 @@ public class Master {
     //start listening on the port specified with the constructor
     public void start() throws Exception {
         //start the deadlock detection
+        /*
         new Thread() {
-
             @Override
             public void run() {
                 while (true) {
@@ -74,6 +74,7 @@ public class Master {
                 }
             }
         }.start();
+        */
         try (ServerSocket listener = new ServerSocket(port, 1000);) {
             System.out.println("Master started at " + listener.getInetAddress().toString() + ":" + listener.getLocalPort());
             while (true) {

@@ -46,10 +46,10 @@ class MasterIncomingMessageHandler extends Thread {
 
     @Override
     public void run() {
-        try {
-            while (true) {
+        while (true) {
+            try {
                 ClubsPMessage msg = (ClubsPMessage) in.readObject();
-                System.out.println(System.currentTimeMillis()+": Received command " + msg+" "+msg.getId());
+                System.out.println(System.currentTimeMillis() + ": Received command " + msg + " " + msg.getId());
                 if (msg instanceof ExecutionMessage) {
                     MasterExecution ex = master.masterExecutions.get(((ExecutionMessage) msg).executionId);
                     if (msg instanceof LoadDataSetResponse) {
@@ -86,9 +86,10 @@ class MasterIncomingMessageHandler extends Thread {
                 } else {
                     System.out.println("Unrecognized message type");
                 }
+            } catch (Exception e) {
+                System.out.println("Error reading messare: " + e.getMessage());
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

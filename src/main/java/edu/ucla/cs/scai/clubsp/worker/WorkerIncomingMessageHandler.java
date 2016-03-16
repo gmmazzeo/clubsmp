@@ -48,10 +48,10 @@ class WorkerIncomingMessageHandler extends Thread {
 
     @Override
     public void run() {
-        try {
-            while (true) {
+        while (true) {
+            try {
                 ClubsPMessage msg = (ClubsPMessage) in.readObject();
-                System.out.println(System.currentTimeMillis()+": Received command " + msg+" "+msg.getId());
+                System.out.println(System.currentTimeMillis() + ": Received command " + msg + " " + msg.getId());
                 if (msg instanceof LoadDataSetRequest) {
                     LoadDataSetRequest c = (LoadDataSetRequest) msg;
                     worker.initExecution(c.executionId, c.dataSetId, c.workers, c.scaleFactor);
@@ -94,9 +94,10 @@ class WorkerIncomingMessageHandler extends Thread {
                 } else {
                     System.out.println("Unrecognized message type");
                 }
+            } catch (Exception e) {
+                System.out.println("Error reading message: " + e.getMessage());
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }
