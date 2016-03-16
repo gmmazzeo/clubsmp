@@ -196,7 +196,7 @@ public class WorkerExecution {
         worker.sendMessageToMaster(new ComputeValleyCriterionResponse(executionId, blockId, dimension, satisfied));
     }
 
-    public synchronized void computeRestrictedCount(ArrayList<Integer> blockIds, ArrayList<Range> restrictedRanges) {
+    public void computeRestrictedCount(ArrayList<Integer> blockIds, ArrayList<Range> restrictedRanges) {
         ArrayList<Integer> count = new ArrayList<>();
         for (int i = 0; i < blockIds.size(); i++) {
             int c = blocks.get(blockIds.get(i)).rangeCount(restrictedRanges.get(i));
