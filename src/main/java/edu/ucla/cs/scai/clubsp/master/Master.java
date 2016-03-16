@@ -33,7 +33,6 @@ public class Master {
     int port;
     final HashMap<String, ObjectOutputStream> workerOutputStreams = new HashMap<>(); //used to send messages to workers
     final HashMap<String, MasterExecution> masterExecutions = new HashMap<>();
-    final HashMap<String, MarginalComputationExecutionPlan> testMarginalAggregations = new HashMap<>();
     final HashMap<String, RegisteredWorker> registeredWorkers = new HashMap<>();
 
     public Master(int port) throws Exception {

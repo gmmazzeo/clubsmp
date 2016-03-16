@@ -138,7 +138,9 @@ public class Worker {
 
     public synchronized void sendMessageToWorker(String workerId, ClubsPMessage message) {
         try {
+            System.out.println("Sending "+message+" to "+workerId);
             workerOutputStreams.get(workerId).writeObject(message);
+            System.out.println("Sent "+message+" to "+workerId);
         } catch (Exception e) {
             e.printStackTrace();
         }
