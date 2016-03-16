@@ -25,8 +25,6 @@ import edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGe
 import static edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGenerator.createImage;
 import static edu.ucla.cs.scai.clustering.syntheticgenerator.MultidimensionalGaussianGenerator.shuffleDataset;
 import edu.ucla.cs.scai.clustering.syntheticgenerator.Range;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -79,7 +77,7 @@ public class Worker {
                 Socket socketOut = new Socket(masterIp, masterPort);
                 socketOut.setTcpNoDelay(true);
                 socketOut.setKeepAlive(true);
-                masterOutputStream = new ObjectOutputStream(new BufferedOutputStream(socketOut.getOutputStream()));
+                masterOutputStream = new ObjectOutputStream(socketOut.getOutputStream());
                 System.out.println("Saved socket to send messages to master");
                 masterOutputStream.writeObject(new WorkerConnectionRequest(port));
             } catch (Exception e) {
@@ -92,7 +90,7 @@ public class Worker {
                 Socket socketIn = listener.accept();
                 socketIn.setTcpNoDelay(true);
                 try {
-                    ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(socketIn.getInputStream()));
+                    ObjectInputStream in = new ObjectInputStream(socketIn.getInputStream());
                     ClubsPMessage msg = (ClubsPMessage) in.readObject();
                     //System.out.println("Received message " + msg);
                     if (msg instanceof WorkerConnectionResponse) {
@@ -215,7 +213,7 @@ public class Worker {
                     Socket socketOut = new Socket(worker.ip, worker.port);
                     socketOut.setTcpNoDelay(true);
                     socketOut.setKeepAlive(true);
-                    ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(socketOut.getOutputStream()));
+                    ObjectOutputStream out = new ObjectOutputStream(socketOut.getOutputStream());
                     workerOutputStreams.put(worker.id, out);
                     System.out.println("Saved socket to send messages to worker " + worker.id);
                     out.writeObject(new WorkerConnectionRequest2(id));
